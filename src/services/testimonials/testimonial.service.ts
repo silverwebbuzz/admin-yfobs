@@ -18,6 +18,38 @@ export class testimonialService {
     @InjectModel('testimonials')
     private testimonialsModel: Model<testimonials>,
   ) {}
+  /*
+    Service function to upload image 
+  **/
+
+  public async uploadTestimonialImage(res: Response, body, id: string) {
+    if (body.file) {
+      const base64Str = body.file;
+      const path = './uploads/setting/';
+      const optionalObj = {
+        fileName: '',
+        type: base64Str.split(';')[0].split('/')[1],
+      };
+      const imageInfo = base64ToImage(base64Str, path, optionalObj);
+      const filePath = `http://${process.env.HOST}:${process.env.PORT}/testimonials/uploads/testimonials/${imageInfo.fileName}`;
+
+      const newLogo = await this.testimonialsModel.findByIdAndUpdate(
+        id,
+        { image: filePath },
+        {
+          new: true,
+        },
+      );
+      return CommonMethods.success(
+        res,
+        'Image uploaded successfully',
+        200,
+        newLogo,
+      );
+    } else {
+      return CommonMethods.error(res, 400, 'Image Not Uploaded');
+    }
+  }
 
   /*
     Service function to created Testimonial
@@ -26,18 +58,7 @@ export class testimonialService {
     res: Response,
     testimonialDto: testimonialDto,
   ): Promise<testimonials> {
-    const base64Str = testimonialDto.image;
-    const path = './uploads/testimonials/';
-    const optionalObj = {
-      fileName: '',
-      type: base64Str.split(';')[0].split('/')[1],
-    };
-    const imageInfo = base64ToImage(base64Str, path, optionalObj);
-
-    const filePath = `http://${process.env.HOST}:${process.env.PORT}/testimonials/uploads/testimonials/${imageInfo.fileName}`;
-    const newTestimonials = new this.testimonialsModel(testimonialDto).$set({
-      image: filePath,
-    });
+    const newTestimonials = await new this.testimonialsModel(testimonialDto);
     if (newTestimonials) {
       await newTestimonials.save();
       return CommonMethods.success(
@@ -95,31 +116,54 @@ export class testimonialService {
     TestimonialId: string,
     testimonialDto: testimonialDto,
   ): Promise<testimonials> {
-    const base64Str = testimonialDto.image;
-    const path = './uploads/testimonials/';
-    const optionalObj = {
-      fileName: '',
-      type: base64Str.split(';')[0].split('/')[1],
-    };
-    const imageInfo = base64ToImage(base64Str, path, optionalObj);
-    const { name, designation, feedback } = testimonialDto;
-    const filePath = `http://${process.env.HOST}:${process.env.PORT}/testimonials/uploads/testimonials/${imageInfo.fileName}`;
     const editTestimonial = await this.testimonialsModel.findByIdAndUpdate(
       TestimonialId,
-      { image: filePath, name, designation, feedback },
-      { new: true },
+      testimonialDto,
+      {
+        new: true,
+      },
     );
     if (editTestimonial) {
       return CommonMethods.success(
         res,
-        'Testimonial Edited Successfully',
+        'Testimonials Edited Successfully',
         200,
         editTestimonial,
       );
     } else {
-      return CommonMethods.error(res, 400, 'No Testimonial Present');
+      return CommonMethods.error(res, 400, 'No Testimonials present');
     }
   }
+  // async updateTestimonials(
+  //   res: Response,
+  //   TestimonialId: string,
+  //   testimonialDto: testimonialDto,
+  // ): Promise<testimonials> {
+  //   const base64Str = testimonialDto.image;
+  //   const path = './uploads/testimonials/';
+  //   const optionalObj = {
+  //     fileName: '',
+  //     type: base64Str.split(';')[0].split('/')[1],
+  //   };
+  //   const imageInfo = base64ToImage(base64Str, path, optionalObj);
+  //   const { name, designation, feedback } = testimonialDto;
+  //   const filePath = `http://${process.env.HOST}:${process.env.PORT}/testimonials/uploads/testimonials/${imageInfo.fileName}`;
+  //   const editTestimonial = await this.testimonialsModel.findByIdAndUpdate(
+  //     TestimonialId,
+  //     { image: filePath, name, designation, feedback },
+  //     { new: true },
+  //   );
+  //   if (editTestimonial) {
+  //     return CommonMethods.success(
+  //       res,
+  //       'Testimonial Edited Successfully',
+  //       200,
+  //       editTestimonial,
+  //     );
+  //   } else {
+  //     return CommonMethods.error(res, 400, 'No Testimonial Present');
+  //   }
+  // }
   /*
     Service function to deleted Testimonial
   **/

@@ -18,6 +18,11 @@ export class testimonialController {
   async createTestimonials(@Res() res, @Body() testimonialDto: testimonialDto) {
     await this.testimonialService.createTestimonials(res, testimonialDto);
   }
+
+  @Post('uploadImage/:id')
+  async uploadLogo(@Res() res, @Body() body, @Param('id') id) {
+    await this.testimonialService.uploadTestimonialImage(res, body, id);
+  }
   //get image Testimonials
   @Get('/uploads/testimonials/:filename')
   getProfileImage(@Param('filename') filename, @Res() res) {

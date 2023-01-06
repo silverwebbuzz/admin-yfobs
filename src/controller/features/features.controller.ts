@@ -19,6 +19,11 @@ export class featuresController {
   async createFeatures(@Res() res, @Body() featuresDto: featuresDto) {
     await this.featuresService.createFeatures(res, featuresDto);
   }
+
+  @Post('uploadImage/:id')
+  async uploadImage(@Res() res, @Body() body, @Param('id') id) {
+    await this.featuresService.uploadFeaturesImage(res, body, id);
+  }
   //getAllFeatures Controller
   @Post('/getAllFeatures')
   async getAllFeatures(@Res() res, @Body() searchDto: searchDto, @Body() body) {

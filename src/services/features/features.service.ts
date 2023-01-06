@@ -20,61 +20,128 @@ export class featuresService {
     private featuresModel: Model<features>,
   ) {}
 
+  public async uploadFeaturesImage(res: Response, body, id: string) {
+    if (body.file) {
+      const base64Str = body.file;
+      const path = './uploads/features/';
+      const optionalObj = {
+        fileName: '',
+        type: base64Str.split(';')[0].split('/')[1],
+      };
+      const imageInfo = base64ToImage(base64Str, path, optionalObj);
+      const filePath = `http://${process.env.HOST}:${process.env.PORT}/features/uploads/features/${imageInfo.fileName}`;
+
+      const newLogo = await this.featuresModel.findByIdAndUpdate(
+        id,
+        { image: filePath },
+        {
+          new: true,
+        },
+      );
+      return CommonMethods.success(
+        res,
+        'Image uploaded successfully',
+        200,
+        newLogo,
+      );
+    } else {
+      return CommonMethods.error(res, 400, 'Image Not Uploaded');
+    }
+  }
+
   /*
     Service function to create a features
   **/
-  async createFeatures(res: Response, featuresDto: featuresDto) {
-    const base64Str = featuresDto.image;
-    const path = './uploads/features/';
-    const optionalObj = {
-      fileName: '',
-      type: base64Str.split(';')[0].split('/')[1],
-    };
-    const imageInfo = base64ToImage(base64Str, path, optionalObj);
-
-    const filePath = `http://${process.env.HOST}:${process.env.PORT}/features/uploads/features/${imageInfo.fileName}`;
-    const newFeatures = new this.featuresModel(featuresDto).$set({
-      image: filePath,
-    });
+  async createFeatures(
+    res: Response,
+    featuresDto: featuresDto,
+  ): Promise<features> {
+    const newFeatures = await new this.featuresModel(featuresDto);
     if (newFeatures) {
       await newFeatures.save();
-      return CommonMethods.success(res, 'Features Created', 200, newFeatures);
+      return CommonMethods.success(
+        res,
+        'Features Created Successfully',
+        200,
+        newFeatures,
+      );
     } else {
       return CommonMethods.error(res, 400, 'Already Exists');
     }
   }
+  // async createFeatures(res: Response, featuresDto: featuresDto) {
+  //   const base64Str = featuresDto.image;
+  //   const path = './uploads/features/';
+  //   const optionalObj = {
+  //     fileName: '',
+  //     type: base64Str.split(';')[0].split('/')[1],
+  //   };
+  //   const imageInfo = base64ToImage(base64Str, path, optionalObj);
+
+  //   const filePath = `http://${process.env.HOST}:${process.env.PORT}/features/uploads/features/${imageInfo.fileName}`;
+  //   const newFeatures = new this.featuresModel(featuresDto).$set({
+  //     image: filePath,
+  //   });
+  //   if (newFeatures) {
+  //     await newFeatures.save();
+  //     return CommonMethods.success(res, 'Features Created', 200, newFeatures);
+  //   } else {
+  //     return CommonMethods.error(res, 400, 'Already Exists');
+  //   }
+  // }
   /*
     Service function to update a features
   **/
-  async updateFeatures(res: Response, id: string, featuresDto: featuresDto) {
-    const base64Str = featuresDto.image;
-    const path = './uploads/features/';
-    const optionalObj = {
-      fileName: '',
-      type: base64Str.split(';')[0].split('/')[1],
-    };
-    const imageInfo = base64ToImage(base64Str, path, optionalObj);
-    const { name, order, details, homeFeatures } = featuresDto;
-
-    const filePath = `http://${process.env.HOST}:${process.env.PORT}/features/uploads/features/${imageInfo.fileName}`;
-
-    const newFeatures = await this.featuresModel.findByIdAndUpdate(
+  async updateFeatures(
+    res: Response,
+    id: string,
+    featuresDto: featuresDto,
+  ): Promise<features> {
+    const editCategory = await this.featuresModel.findByIdAndUpdate(
       id,
-      {
-        image: filePath,
-        name,
-        order,
-        details,
-        homeFeatures,
-      },
+      featuresDto,
       { new: true },
     );
-    if (newFeatures) {
-      return CommonMethods.success(res, 'Features updated', 200, newFeatures);
+    if (editCategory) {
+      return CommonMethods.success(
+        res,
+        'features Edited Successfully',
+        200,
+        editCategory,
+      );
     } else {
-      return CommonMethods.error(res, 400, 'Already Exists');
+      return CommonMethods.error(res, 400, 'No features Present');
     }
   }
+  // async updateFeatures(res: Response, id: string, featuresDto: featuresDto) {
+  //   const base64Str = featuresDto.image;
+  //   const path = './uploads/features/';
+  //   const optionalObj = {
+  //     fileName: '',
+  //     type: base64Str.split(';')[0].split('/')[1],
+  //   };
+  //   const imageInfo = base64ToImage(base64Str, path, optionalObj);
+  //   const { name, order, details, homeFeatures } = featuresDto;
+
+  //   const filePath = `http://${process.env.HOST}:${process.env.PORT}/features/uploads/features/${imageInfo.fileName}`;
+
+  //   const newFeatures = await this.featuresModel.findByIdAndUpdate(
+  //     id,
+  //     {
+  //       image: filePath,
+  //       name,
+  //       order,
+  //       details,
+  //       homeFeatures,
+  //     },
+  //     { new: true },
+  //   );
+  //   if (newFeatures) {
+  //     return CommonMethods.success(res, 'Features updated', 200, newFeatures);
+  //   } else {
+  //     return CommonMethods.error(res, 400, 'Already Exists');
+  //   }
+  // }
   /*
     Service function to getall a features with search functionality 
   **/
