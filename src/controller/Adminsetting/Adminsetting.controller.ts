@@ -6,6 +6,7 @@ import { socialSettingDto } from 'src/dto/adminsetting/socialSetting.dto';
 import { MailsettingDto } from 'src/dto/adminsetting/mailSetting.dto';
 import { PreferencesDto } from 'src/dto/adminsetting/preferences.dto';
 import { TermsandserviceDto } from 'src/dto/adminsetting/termsandService.dto';
+import { reCaptchaDto } from 'src/dto/adminsetting/reCaptcha.dto';
 @Controller('setting')
 export class settingController {
   constructor(private settingService: settingService) {}
@@ -107,5 +108,14 @@ export class settingController {
       adminId,
       termsandserviceDto,
     );
+  }
+  //reCaptcha updated
+  @Post('/reCaptcha/:adminId')
+  public async reCaptcha(
+    @Res() res,
+    @Param('adminId') adminId,
+    @Body() reCaptchaDto: reCaptchaDto,
+  ) {
+    return await this.settingService.reCaptcha(res, adminId, reCaptchaDto);
   }
 }

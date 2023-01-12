@@ -16,6 +16,7 @@ import { socialSettingDto } from 'src/dto/adminsetting/socialSetting.dto';
 import { MailsettingDto } from 'src/dto/adminsetting/mailSetting.dto';
 import { PreferencesDto } from 'src/dto/adminsetting/preferences.dto';
 import { TermsandserviceDto } from 'src/dto/adminsetting/termsandService.dto';
+import { reCaptchaDto } from 'src/dto/adminsetting/reCaptcha.dto';
 import { CommonMethods } from 'src/utilities/common.method';
 import { Response } from 'express';
 const base64ToImage = require('base64-to-image');
@@ -278,6 +279,27 @@ export class settingService {
         200,
         Update,
       );
+    } else {
+      return CommonMethods.error(res, 400, 'AdminId Not Found');
+    }
+  }
+
+  /* 
+  Service function to recaptcha
+  **/
+
+  public async reCaptcha(
+    res: Response,
+    adminId: string,
+    reCaptchaDto: reCaptchaDto,
+  ): Promise<Setting> {
+    const Updated = await this.settingModel.findByIdAndUpdate(
+      adminId,
+      reCaptchaDto,
+      { new: true },
+    );
+    if (Updated) {
+      return CommonMethods.success(res, 'Success', 200, Updated);
     } else {
       return CommonMethods.error(res, 400, 'AdminId Not Found');
     }

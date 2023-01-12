@@ -40,7 +40,9 @@ import { taxController } from './controller/tax/tax.controller';
 import { taxService } from './services/tax/tax.service';
 import { BlogCategorySchema } from './models/blogCategory.schema';
 import { blogCategoryController } from './controller/blog/blogCategory.controller';
-
+import { paymentSchema } from './models/payment.schema';
+import { paymentController } from './controller/payment/payment.controller';
+import { paymentService } from './services/payment/payment.service';
 import { ConfigModule } from '@nestjs/config';
 import { blogCategoryService } from './services/blog/blogCategory.service';
 @Module({
@@ -73,6 +75,7 @@ import { blogCategoryService } from './services/blog/blogCategory.service';
     MongooseModule.forFeature([
       { name: 'blogCategory', schema: BlogCategorySchema },
     ]),
+    MongooseModule.forFeature([{ name: 'Payment', schema: paymentSchema }]),
   ],
   controllers: [
     AppController,
@@ -89,6 +92,7 @@ import { blogCategoryService } from './services/blog/blogCategory.service';
     testimonialController,
     taxController,
     blogCategoryController,
+    paymentController,
   ],
   providers: [
     AppService,
@@ -105,6 +109,7 @@ import { blogCategoryService } from './services/blog/blogCategory.service';
     testimonialService,
     taxService,
     blogCategoryService,
+    paymentService,
   ],
 })
 export class AppModule {}
